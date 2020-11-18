@@ -1,6 +1,6 @@
 import React from 'react';
 import { Text, StyleSheet, FlatList } from 'react-native';
-import ColourBox from '../components/ColourBox';
+import ColorBox from '../components/ColorBox';
 
 const MyApp = ({ route }) => {
   return (
@@ -10,9 +10,9 @@ const MyApp = ({ route }) => {
       }
       contentContainerStyle={styles.container}
       keyExtractor={(item) => item.colorName}
-      data={route.params.colours}
+      data={route.params.colors}
       renderItem={({ item }) => (
-        <ColourBox hexCode={item.hexCode} colourName={item.colorName} />
+        <ColorBox hexCode={item.hexCode} colorName={item.colorName} />
       )}
     />
   );

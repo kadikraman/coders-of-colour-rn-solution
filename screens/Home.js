@@ -39,9 +39,9 @@ const FRONTEND_MASTERS = [
 ];
 
 const COLOR_PALETTES = [
-  { paletteName: 'Solarized', colours: COLORS },
-  { paletteName: 'Rainbow', colours: RAINBOW },
-  { paletteName: 'Frontend Masters', colours: FRONTEND_MASTERS },
+  { paletteName: 'Solarized', colors: COLORS },
+  { paletteName: 'Rainbow', colors: RAINBOW },
+  { paletteName: 'Frontend Masters', colors: FRONTEND_MASTERS },
 ];
 
 const Home = () => {
@@ -54,15 +54,15 @@ const Home = () => {
       renderItem={({ item }) => (
         <TouchableOpacity
           onPress={() =>
-            navigation.navigate('ColorPalette', { colours: item.colours })
+            navigation.navigate('ColorPalette', { colors: item.colors })
           }
         >
           <Text style={styles.title}>{item.paletteName}</Text>
           <View style={styles.preview}>
-            {item.colours.slice(0, 5).map((colour) => (
+            {item.colors.slice(0, 5).map((color) => (
               <View
-                key={colour.hexCode}
-                style={[styles.box, { backgroundColor: colour.hexCode }]}
+                key={color.hexCode}
+                style={[styles.box, { backgroundColor: color.hexCode }]}
               />
             ))}
           </View>
