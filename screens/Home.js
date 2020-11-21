@@ -1,56 +1,57 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import React, { useState, useCallback, useEffect } from 'react';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  RefreshControl,
+} from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 
-const COLORS = [
-  { colorName: 'Base03', hexCode: '#002b36' },
-  { colorName: 'Base02', hexCode: '#073642' },
-  { colorName: 'Base01', hexCode: '#586e75' },
-  { colorName: 'Base00', hexCode: '#657b83' },
-  { colorName: 'Base0', hexCode: '#839496' },
-  { colorName: 'Base1', hexCode: '#93a1a1' },
-  { colorName: 'Base2', hexCode: '#eee8d5' },
-  { colorName: 'Base3', hexCode: '#fdf6e3' },
-  { colorName: 'Yellow', hexCode: '#b58900' },
-  { colorName: 'Orange', hexCode: '#cb4b16' },
-  { colorName: 'Red', hexCode: '#dc322f' },
-  { colorName: 'Magenta', hexCode: '#d33682' },
-  { colorName: 'Violet', hexCode: '#6c71c4' },
-  { colorName: 'Blue', hexCode: '#268bd2' },
-  { colorName: 'Cyan', hexCode: '#2aa198' },
-  { colorName: 'Green', hexCode: '#859900' },
-];
+const Home = ({ route, navigation }) => {
+  const [colorPalettes, setColorPalettes] = useState([]);
+  const [refreshing, setRefreshing] = useState(false);
 
-const RAINBOW = [
-  { colorName: 'Red', hexCode: '#FF0000' },
-  { colorName: 'Orange', hexCode: '#FF7F00' },
-  { colorName: 'Yellow', hexCode: '#FFFF00' },
-  { colorName: 'Green', hexCode: '#00FF00' },
-  { colorName: 'Violet', hexCode: '#8B00FF' },
-];
+  const newPalette = route.params ? route.params.newPalette : null;
 
-const FRONTEND_MASTERS = [
-  { colorName: 'Red', hexCode: '#c02d28' },
-  { colorName: 'Black', hexCode: '#3e3e3e' },
-  { colorName: 'Grey', hexCode: '#8a8a8a' },
-  { colorName: 'White', hexCode: '#ffffff' },
-  { colorName: 'Orange', hexCode: '#e66225' },
-];
+  const fetchColorPalettes = useCallback(async () => {
+    const result = await fetch(
+      'https://color-palette-api.kadikraman.now.sh/palettes',
+    );
+    const data = await result.json();
+    setColorPalettes(data);
+  }, []);
 
-const COLOR_PALETTES = [
-  { paletteName: 'Solarized', colors: COLORS },
-  { paletteName: 'Rainbow', colors: RAINBOW },
-  { paletteName: 'Frontend Masters', colors: FRONTEND_MASTERS },
-];
+  const handleRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await fetchColorPalettes();
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 1000);
+  }, []);
 
-const Home = () => {
-  const navigation = useNavigation();
+  useEffect(() => {
+    fetchColorPalettes();
+  }, []);
+
+  useEffect(() => {
+    if (newPalette) {
+      setColorPalettes((current) => [newPalette, ...current]);
+    }
+  }, [newPalette]);
 
   return (
     <FlatList
+      ListHeaderComponent={
+        <TouchableOpacity onPress={() => navigation.navigate('AddNewPalette')}>
+          <Text style={styles.newText}>Add a New Palette</Text>
+        </TouchableOpacity>
+      }
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+      }
       contentContainerStyle={styles.container}
-      keyExtractor={(item) => item.paletteName}
+      keyExtractor={(item, index) => `${item.paletteName}-${index}`}
       renderItem={({ item }) => (
         <TouchableOpacity
           onPress={() =>
@@ -68,7 +69,7 @@ const Home = () => {
           </View>
         </TouchableOpacity>
       )}
-      data={COLOR_PALETTES}
+      data={colorPalettes}
     />
   );
 };
@@ -96,6 +97,11 @@ const styles = StyleSheet.create({
   },
   container: {
     padding: 10,
+  },
+  newText: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
   },
 });
 
